@@ -6,12 +6,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.cos.hello.config.DBConn;
+import com.cos.hello.dto.JoinDto;
+import com.cos.hello.dto.LoginDto;
 import com.cos.hello.model.Users;
 
 // Data Access Object
 public class UsersDao {
 	
-	public int insert(Users user) {
+	public int insert(JoinDto joinDto) {
 		
 		StringBuffer sb = new StringBuffer(); // String 전용 컬렉션(동기화)
 		sb.append("INSERT INTO users(username, password, email)" ); // 끝에 한칸 띄워줘야함
@@ -20,9 +22,9 @@ public class UsersDao {
 		Connection conn = DBConn.getInstance();
 		try {
 			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, user.getUsername());
-			pstmt.setString(2, user.getPassword());
-			pstmt.setString(3, user.getEmail());
+			pstmt.setString(1, joinDto.getUsername());
+			pstmt.setString(2, joinDto.getPassword());
+			pstmt.setString(3, joinDto.getEmail());
 			int result = pstmt.executeUpdate(); // 변경된 행의 개수를 리턴
 			return result;
 		} catch (Exception e) {
@@ -31,7 +33,7 @@ public class UsersDao {
 		return -1;
 	}
 	
-	public Users login(Users user) {
+	public Users login(LoginDto loginDto) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT id, username, email FROM users WHERE username = ? AND password = ?");
 		String sql = sb.toString();
@@ -39,8 +41,8 @@ public class UsersDao {
 		Connection conn = DBConn.getInstance();
 		try {
 			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, user.getUsername());
-			pstmt.setString(2, user.getPassword());
+			pstmt.setString(1, loginDto.getUsername());
+			pstmt.setString(2, loginDto.getPassword());
 			ResultSet rs = pstmt.executeQuery();
 			
 			if (rs.next()) {

@@ -9,28 +9,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.cos.hello.dao.UsersDao;
+import com.cos.hello.dto.JoinDto;
+import com.cos.hello.dto.LoginDto;
 import com.cos.hello.model.Users;
 import com.cos.hello.util.Script;
 
 public class UsersService {
 	
 	public void 회원가입(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		// 데이터 원형 : username=아이디&password=비밀번호&email=이메일
-		// 1번 form의 input태그에 있는 3가지 값(username, password, email) 받기
-		String username = req.getParameter("username");
-		String password = req.getParameter("password");
-		String email = req.getParameter("email");
-		// getParameter함수는 get방식의 데이터와 post방식의 데이터를 다 받을 수 있음 !!
-        // 단, post 방식에서는 데이터 타입이 x-www-form-urlencoded 방식만 받을 수 있음.
-		Users user = Users.builder()
-						.username(username)
-						.password(password)
-						.email(email)
-						.build();
-		
-		// 2번 DB에 연결해서 3가지 값을 INSERT 하기
+		JoinDto loginDto = (JoinDto)req.getAttribute("dto");
+
 		UsersDao usersDao = new UsersDao(); // 싱글톤 방식으로 바꾸기
-		int result = usersDao.insert(user);
+		int result = usersDao.insert(loginDto);
 		
 		// 3번 INSERT가 정상적으로 되었다면 login.jsp를 응답!!
 		if (result == 1) {
@@ -48,16 +38,10 @@ public class UsersService {
 		// 비정상 : login.jsp
 		
 		// 1번 전달된 값 받기
-		String username = req.getParameter("username");
-		String password = req.getParameter("password");
-		
-		Users user = Users.builder()
-				.username(username)
-				.password(password)
-				.build();
+		LoginDto loginDto = (LoginDto)req.getAttribute("dto");
 		// 2번 DB에 값이 있는지 SELECT해서 확인
 		UsersDao usersDao = new UsersDao();
-		userEntity = usersDao.login(user);
+		userEntity = usersDao.login(loginDto);
 		// 3번 DB에 값이 있으면 세션에 값을 추가하고 이동
 		if (userEntity != null) {
 			HttpSession httpSession = req.getSession(); // 세션 영역(Heap)에 접근
